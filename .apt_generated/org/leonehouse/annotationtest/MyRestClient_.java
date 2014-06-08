@@ -5,9 +5,14 @@
 
 package org.leonehouse.annotationtest;
 
+import java.util.Collections;
 import java.util.HashMap;
 import org.androidannotations.api.rest.RestErrorHandler;
+import org.leonehouse.annotationtest.data.TimeData;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -21,26 +26,9 @@ public final class MyRestClient_
     private RestErrorHandler restErrorHandler;
 
     public MyRestClient_() {
-        rootUrl = "http://company.com/ajax/services";
+        rootUrl = "http://time.jsontest.com/";
         restTemplate = new RestTemplate();
         restTemplate.getMessageConverters().add(new MappingJacksonHttpMessageConverter());
-    }
-
-    @Override
-    public Object getEventsByLocationAndYear(String location, int year) {
-        HashMap<String, Object> urlVariables = new HashMap<String, Object>();
-        urlVariables.put("location", location);
-        urlVariables.put("year", year);
-        try {
-            return restTemplate.exchange(rootUrl.concat("/events/{year}/{location}"), HttpMethod.GET, null, Object.class, urlVariables).getBody();
-        } catch (RestClientException e) {
-            if (restErrorHandler!= null) {
-                restErrorHandler.onRestClientExceptionThrown(e);
-                return null;
-            } else {
-                throw e;
-            }
-        }
     }
 
     @Override
@@ -63,7 +51,41 @@ public final class MyRestClient_
     @Override
     public Object getEvents() {
         try {
-            return restTemplate.exchange(rootUrl.concat("/events"), HttpMethod.GET, null, Object.class).getBody();
+            return restTemplate.exchange(rootUrl.concat(""), HttpMethod.GET, null, Object.class).getBody();
+        } catch (RestClientException e) {
+            if (restErrorHandler!= null) {
+                restErrorHandler.onRestClientExceptionThrown(e);
+                return null;
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    @Override
+    public TimeData getTime() {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setAccept(Collections.singletonList(MediaType.parseMediaType("application/json")));
+        HttpEntity<Object> requestEntity = new HttpEntity<Object>(httpHeaders);
+        try {
+            return restTemplate.exchange(rootUrl.concat(""), HttpMethod.GET, requestEntity, TimeData.class).getBody();
+        } catch (RestClientException e) {
+            if (restErrorHandler!= null) {
+                restErrorHandler.onRestClientExceptionThrown(e);
+                return null;
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    @Override
+    public Object getEventsByLocationAndYear(String location, int year) {
+        HashMap<String, Object> urlVariables = new HashMap<String, Object>();
+        urlVariables.put("location", location);
+        urlVariables.put("year", year);
+        try {
+            return restTemplate.exchange(rootUrl.concat("/events/{year}/{location}"), HttpMethod.GET, null, Object.class, urlVariables).getBody();
         } catch (RestClientException e) {
             if (restErrorHandler!= null) {
                 restErrorHandler.onRestClientExceptionThrown(e);
