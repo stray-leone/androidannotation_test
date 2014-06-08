@@ -27,6 +27,23 @@ public final class MyRestClient_
     }
 
     @Override
+    public Object getEventsByLocationAndYear(String location, int year) {
+        HashMap<String, Object> urlVariables = new HashMap<String, Object>();
+        urlVariables.put("location", location);
+        urlVariables.put("year", year);
+        try {
+            return restTemplate.exchange(rootUrl.concat("/events/{year}/{location}"), HttpMethod.GET, null, Object.class, urlVariables).getBody();
+        } catch (RestClientException e) {
+            if (restErrorHandler!= null) {
+                restErrorHandler.onRestClientExceptionThrown(e);
+                return null;
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    @Override
     public Object getEventsByYearAndLocation(int year, String location) {
         HashMap<String, Object> urlVariables = new HashMap<String, Object>();
         urlVariables.put("location", location);
@@ -47,23 +64,6 @@ public final class MyRestClient_
     public Object getEvents() {
         try {
             return restTemplate.exchange(rootUrl.concat("/events"), HttpMethod.GET, null, Object.class).getBody();
-        } catch (RestClientException e) {
-            if (restErrorHandler!= null) {
-                restErrorHandler.onRestClientExceptionThrown(e);
-                return null;
-            } else {
-                throw e;
-            }
-        }
-    }
-
-    @Override
-    public Object getEventsByLocationAndYear(String location, int year) {
-        HashMap<String, Object> urlVariables = new HashMap<String, Object>();
-        urlVariables.put("location", location);
-        urlVariables.put("year", year);
-        try {
-            return restTemplate.exchange(rootUrl.concat("/events/{year}/{location}"), HttpMethod.GET, null, Object.class, urlVariables).getBody();
         } catch (RestClientException e) {
             if (restErrorHandler!= null) {
                 restErrorHandler.onRestClientExceptionThrown(e);

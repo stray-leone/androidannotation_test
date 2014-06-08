@@ -9,19 +9,26 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import org.androidannotations.api.BackgroundExecutor;
 import org.androidannotations.api.view.HasViews;
-import org.androidannotations.api.view.OnViewChangedListener;
 import org.androidannotations.api.view.OnViewChangedNotifier;
+import org.apache.http.HttpResponse;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.leonehouse.annotationtest.R.layout;
 
 public final class MainActivity_
     extends MainActivity
-    implements HasViews, OnViewChangedListener
+    implements HasViews
 {
 
     private final OnViewChangedNotifier onViewChangedNotifier_ = new OnViewChangedNotifier();
+    private Handler handler_ = new Handler(Looper.getMainLooper());
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -33,8 +40,24 @@ public final class MainActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        myRestClient = new MyRestClient_();
-        OnViewChangedNotifier.registerOnViewChangedListener(this);
+        httpsClient = new DefaultHttpClient() {
+
+
+            @Override
+            protected ClientConnectionManager createClientConnectionManager() {
+                try {
+                    ClientConnectionManager ccm = super.createClientConnectionManager();
+                    ((SSLSocketFactory) ccm.getSchemeRegistry().getScheme("https").getSocketFactory()).setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+                    return ccm;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return super.createClientConnectionManager();
+                }
+            }
+
+        }
+        ;
+        securedRequest();
     }
 
     @Override
@@ -68,8 +91,35 @@ public final class MainActivity_
     }
 
     @Override
-    public void onViewChanged(HasViews hasViews) {
-        afterViews();
+    public void doSomethingWithResponse(final HttpResponse resp) {
+        handler_.post(new Runnable() {
+
+
+            @Override
+            public void run() {
+                MainActivity_.super.doSomethingWithResponse(resp);
+            }
+
+        }
+        );
+    }
+
+    @Override
+    public void securedRequest() {
+        BackgroundExecutor.execute(new BackgroundExecutor.Task("", 0, "") {
+
+
+            @Override
+            public void execute() {
+                try {
+                    MainActivity_.super.securedRequest();
+                } catch (Throwable e) {
+                    Thread.getDefaultUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), e);
+                }
+            }
+
+        }
+        );
     }
 
     public static class IntentBuilder_ {

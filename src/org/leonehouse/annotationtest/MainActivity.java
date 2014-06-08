@@ -1,14 +1,22 @@
 package org.leonehouse.annotationtest;
 
-import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.AfterInject;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.rest.RestService;
+import org.androidannotations.annotations.HttpsClient;
+import org.androidannotations.annotations.UiThread;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 
 import android.app.Activity;
+import android.widget.Toast;
 
 @EActivity(R.layout.activity_main)
 public class MainActivity extends Activity {
 	
+	
+	/*
     @RestService
     MyRestClient myRestClient; //Inject it
 
@@ -16,8 +24,10 @@ public class MainActivity extends Activity {
     void afterViews() {
         myRestClient.getEvents(); //Play with it
     }
+    */
+    
 
-	/*
+	
 	@HttpsClient
 	HttpClient httpsClient;
 
@@ -39,5 +49,5 @@ public class MainActivity extends Activity {
 				"HTTP status " + resp.getStatusLine().getStatusCode(),
 				Toast.LENGTH_LONG).show();
 	}
-	*/
+	
 }
